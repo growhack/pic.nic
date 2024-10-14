@@ -3,12 +3,12 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     margin: 0;
-    height: 100vh;
+    height: 100vh; /* Подгоняем высоту под видимую область */
 }
 
 .container {
     display: flex;
-    height: 100%;
+    height: 100%; /* Подгонка по высоте */
 }
 
 .sidebar {
@@ -16,11 +16,13 @@ body {
     padding: 10px;
     background-color: #2c2c2c;
     border-right: 1px solid #444;
+    display: flex;
+    flex-direction: column;
 }
 
 .user-list {
-    flex-grow: 1;
-    overflow-y: auto;
+    flex-grow: 1; /* Заполняет пространство */
+    overflow-y: auto; /* Прокручивать при избытке содержимого */
 }
 
 .chat-container {
@@ -33,9 +35,10 @@ body {
 
 .tabs {
     display: flex;
-    margin-bottom: -1px;
-    background: #2c2c2c;
-    border-radius: 5px 5px 0 0;
+    margin-bottom: -1px; /* Для соединения вкладок */
+    position: relative; /* Относительно для создания эффекта выпуклости */
+    background: #2c2c2c; /* Фон для создания визуального эффекта */
+    border-radius: 5px 5px 0 0; /* Скругленные верхние углы для контейнера */
     z-index: 1;
 }
 
@@ -45,44 +48,69 @@ body {
     color: white;
     cursor: pointer;
     border: 1px solid #666;
-    border-bottom: none;
-    border-radius: 10px 10px 0 0;
+    border-bottom: none; /* Убираем нижнюю границу для эффекта выпуклости */
+    border-radius: 10px 10px 0 0; /* Скругление верхних углов */
 }
 
 .tab.active {
-    background-color: #666;
-    font-weight: bold;
+    background-color: #666; /* Цвет активной вкладки */
+    font-weight: bold; /* Жирный текст для активной вкладки */
 }
 
 .chat-output {
-    flex-grow: 1;
-    overflow-y: auto;
+    flex-grow: 1; 
+    position: relative; /* Для надежной работы с вложенными элементами */
+    overflow-y: auto; /* Прокручивать при избытке содержимого */
     border: 1px solid #666;
     padding: 10px;
     background-color: #3a3a3a;
+    color: white;
+}
+
+.private-message-output {
+    max-height: 70%; /* Ограничиваем высоту диалога ЛС */
+    overflow-y: auto; /* Прокручивать при избытке содержимого */
 }
 
 .input-area {
-    display: flex;
+    display: flex; 
     margin-top: 10px;
 }
 
 .input-field {
     padding: 10px;
-    background-color: #2c2c2c;
+    background-color: #2c2c2c; 
     border: 1px solid #444;
     color: white;
-    flex-grow: 1;
+    flex-grow: 1; /* Поле ввода занимает всю ширину */
 }
 
 button.send-button {
-    background-color: #444;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 10px 20px;
+    background-color: #444; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+    padding: 10px 20px; /* Увеличено для удобства */
 }
 
+button.back-button {
+    background-color: #444; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+    margin-bottom: 10px; 
+    padding: 5px 10px; 
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+.volume-control, .sensitivity-control {
+    margin-top: 10px;
+}
+
+/* Стили для громкости */
 .volume-indicator {
     width: 100%;
     height: 10px;
@@ -96,6 +124,10 @@ button.send-button {
     display: inline-block;
     margin-right: 5px;
     background-color: black; 
+}
+
+.active {
+    background-color: green; 
 }
 
 /* Стили для слайдеров */
@@ -123,4 +155,17 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 50%; 
     background: #888; 
     cursor: pointer; 
+}
+
+.private-message-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.username-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
