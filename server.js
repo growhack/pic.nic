@@ -1,11 +1,20 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: "*", // Разрешаем все домены, при необходимости можно указать конкретные
+        methods: ["GET", "POST"],
+        allowedHeaders: ["my-custom-header"],
+        credentials: true
+    }
+});
 
+app.use(cors()); // Включаем CORS для всех запросов
 app.use(express.static('public'));
 
 let users = [];
@@ -54,6 +63,7 @@ io.on('connection', (socket) => {
     });
 });
 
+// Запуск сервера
 server.listen(process.env.PORT || 3000, () => {
     console.log('Сервер запущен');
 });

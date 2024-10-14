@@ -1,4 +1,6 @@
-const socket = io();
+const socket = io({
+    transports: ['websocket'], // Явно используем WebSocket
+});
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
 const chatOutput = document.getElementById('chat-output');
@@ -41,10 +43,14 @@ socket.on('update-users', (users) => {
                 <button id="ls-${user}" onclick="startPrivateMessage('${user}')" style="margin-left: 10px;">ЛС</button>
             </div>
         `;
-
         li.prepend(indicator);
         usersList.appendChild(li);
     });
+});
+
+// Проверка подключения
+socket.on('connect', () => {
+    console.log('Подключён к серверу:', socket.id);
 });
 
 // Инициация WebRTC соединения для пользователя
@@ -80,7 +86,7 @@ function initiatePeerConnection(user) {
 
 socket.on('webrtc-offer', (data) => {
     const peerConnection = new RTCPeerConnection();
-    peerConnections[data.from] = peerConnection; 
+    peerConnections[data.from] = peerConnection;
 
     mediaStream.getAudioTracks().forEach((track) => {
         peerConnection.addTrack(track, mediaStream);
@@ -120,6 +126,7 @@ function startPrivateMessage(user) {
         openPrivateChats[user] = true;
         createPrivateMessageTab(user);
         switchToPrivateMessageTab(user);
+        initiatePeerConnection(user); // Инициация WebRTC соединения
     } else {
         alert(`ЛС с ${user} уже открыто.`);
     }
