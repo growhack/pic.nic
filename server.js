@@ -7,11 +7,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "*", // Разрешаем все домены, при необходимости можно указать конкретные
+        origin: "https://pic-nic.vercel.app", // Укажите URL вашего клиента
         methods: ["GET", "POST"],
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
-    }
+        allowedHeaders: ["pic.nic"],
+        credentials: true,
+    },
 });
 
 app.use(cors()); // Включаем CORS для всех запросов
