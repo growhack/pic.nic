@@ -1,5 +1,5 @@
-const socket = io({
-    transports: ['websocket'], // Явно используем WebSocket
+const socket = io('https://pic-nic.vercel.app', {
+    transports: ['websocket'], // Используем только WebSocket
 });
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
