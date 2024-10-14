@@ -1,15 +1,15 @@
 const express = require('express');
-const http = require('http'); // Уберите импорт HTTPS
+const http = require('http');
 const socketIo = require('socket.io');
 
 const app = express();
-const server = http.createServer(app); // Используйте HTTP
+const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use(express.static('public'));
 
 let users = [];
-let privateChats = {}; // Хранит информацию об открытых личных чатах
+let privateChats = {};
 
 io.on('connection', (socket) => {
     socket.on('user-joined', (username) => {
@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
         socket.to(data.to).emit('chat-open', { from: socket.username });
     });
 
-    // Обработка сигналов WebRTC
+    // WebRTC обработка
     socket.on('webrtc-offer', (data) => {
         socket.to(data.to).emit('webrtc-offer', { from: socket.username, sdp: data.sdp });
     });
@@ -52,7 +52,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// Запуск сервера на порту, указанном Railway
 server.listen(process.env.PORT || 3000, () => {
     console.log('Сервер запущен');
 });

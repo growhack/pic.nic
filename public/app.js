@@ -1,10 +1,9 @@
-const socket = io(); // Используем автоматическое определение адреса
+const socket = io();
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
 const chatOutput = document.getElementById('chat-output');
 const usersList = document.getElementById('users');
 const volumeSlider = document.getElementById('volume-slider');
-const sensitivitySlider = document.getElementById('sensitivity-slider');
 const volumeIndicator = document.getElementById('volume-indicator');
 const tabsContainer = document.getElementById('tabs');
 
@@ -107,9 +106,7 @@ socket.on('ice-candidate', (data) => {
 });
 
 socket.on('chat-message', (messageObj) => {
-    if (activeTabId === 'chat') {
-        addChatMessage(messageObj);
-    }
+    addChatMessage(messageObj);
 });
 
 // Функция для начала личного сообщения
@@ -142,7 +139,6 @@ function sendMessage() {
         } else if (activeTabId.startsWith('private-')) {
             const recipient = activeTabId.split('-')[1];
             socket.emit('private-message', { to: recipient, msg: messageObj.msg });
-            addPrivateMessage(messageObj);
         }
 
         chatInput.value = '';
@@ -157,20 +153,10 @@ function addChatMessage(messageObj) {
 }
 
 socket.on('private-message', (messageObj) => {
-    if (!privateMessages[messageObj.from]) {
-        privateMessages[messageObj.from] = [];
-    }
-
-    privateMessages[messageObj.from].push(messageObj);
-    addPrivateMessage(messageObj);
-
     if (!openPrivateChats[messageObj.from]) {
         startPrivateMessage(messageObj.from);
     }
-});
-
-socket.on('chat-open', (data) => {
-    startPrivateMessage(data.from);
+    addPrivateMessage(messageObj);
 });
 
 function addPrivateMessage(messageObj) {
@@ -180,12 +166,6 @@ function addPrivateMessage(messageObj) {
         p.innerHTML = `<strong>${messageObj.from}:</strong> ${messageObj.msg}`;
         privateOutput.appendChild(p);
         privateOutput.scrollTop = privateOutput.scrollHeight; 
-
-        if (messageObj.from === username) {
-            const yourMessage = document.createElement('p');
-            yourMessage.innerHTML = `<strong>Вы:</strong> ${messageObj.msg}`;
-            privateOutput.appendChild(yourMessage);
-        }
     } else {
         console.error(`Контейнер для сообщений от ${messageObj.from} не найден!`);
     }
@@ -203,8 +183,6 @@ function createPrivateMessageTab(user) {
     privateMessageDiv.className = 'private-message-output';
     document.body.appendChild(privateMessageDiv);
     privateMessageDiv.style.display = 'none';
-
-    privateMessageDiv.innerHTML = '';
 }
 
 function switchToPrivateMessageTab(user) {
@@ -236,8 +214,6 @@ function closePrivateChat(user) {
     if (privateMessageDiv) {
         document.body.removeChild(privateMessageDiv);
     }
-    
-    delete privateMessages[user];
 }
 
 function setActiveTab(user) {
@@ -259,29 +235,12 @@ function clearActiveTabs() {
     });
 }
 
-function addNewPrivateChat() {
-    const user = prompt("Введите имя пользователя для ЛС:");
-    if (user) {
-        startPrivateMessage(user);
-    }
-}
-
-function switchToMainChat() {
-    activeTabId = 'chat';
-    clearActiveTabs();
-    const mainChatTab = tabsContainer.querySelector('.tab.active');
-    if (mainChatTab) {
-        mainChatTab.classList.add('active');
-    }
-}
-
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
         mediaStream = stream;
         const audioContext = new AudioContext();
         const analyser = audioContext.createAnalyser();
         const source = audioContext.createMediaStreamSource(stream);
-
         source.connect(analyser);
         analyser.connect(audioContext.destination);
 
@@ -289,8 +248,8 @@ navigator.mediaDevices.getUserMedia({ audio: true })
         function updateVolumeIndicator() {
             analyser.getByteFrequencyData(dataArray);
             const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-            const volume = average / 256; // Нормализация значения
-            
+            const volume = average / 256; 
+
             const indicator = document.getElementById(`indicator-${username}`);
             indicator.style.backgroundColor = volume > 0.1 ? 'green' : 'black';
             volumeIndicator.style.height = `${Math.min(volume * 100, 100)}%`;
@@ -305,8 +264,4 @@ navigator.mediaDevices.getUserMedia({ audio: true })
 
 volumeSlider.addEventListener('input', () => {
     const volume = volumeSlider.value;
-});
-
-sensitivitySlider.addEventListener('input', () => {
-    const sensitivity = sensitivitySlider.value;
 });
