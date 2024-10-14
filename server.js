@@ -17,6 +17,8 @@ io.on('connection', (socket) => {
             users.push(username);
             socket.username = username;
             io.emit('update-users', users);
+        } else {
+            socket.emit('name-taken', username); // Уведомление, если имя занято
         }
     });
 

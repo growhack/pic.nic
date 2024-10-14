@@ -7,12 +7,21 @@ const volumeSlider = document.getElementById('volume-slider');
 const volumeIndicator = document.getElementById('volume-indicator');
 const tabsContainer = document.getElementById('tabs');
 
-let username = prompt("Введите ваше имя:") || 'Гость';
+let username;
 let mediaStream;
 let activeTabId = 'chat';
 let openPrivateChats = {};
-let privateMessages = {};
 let peerConnections = {};
+
+// Запрос имени пользователя
+function requestUsername() {
+    do {
+        username = prompt("Введите ваше имя:");
+    } while (!username);
+}
+
+// Запрашиваем имя
+requestUsername();
 
 // Уведомление о том, что пользователь присоединился
 socket.emit('user-joined', username);
@@ -35,10 +44,6 @@ socket.on('update-users', (users) => {
 
         li.prepend(indicator);
         usersList.appendChild(li);
-        
-        if (user !== username) {
-            initiatePeerConnection(user);
-        }
     });
 });
 
@@ -166,8 +171,6 @@ function addPrivateMessage(messageObj) {
         p.innerHTML = `<strong>${messageObj.from}:</strong> ${messageObj.msg}`;
         privateOutput.appendChild(p);
         privateOutput.scrollTop = privateOutput.scrollHeight; 
-    } else {
-        console.error(`Контейнер для сообщений от ${messageObj.from} не найден!`);
     }
 }
 
@@ -235,6 +238,7 @@ function clearActiveTabs() {
     });
 }
 
+// Запрашиваем доступ к микрофону
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
         mediaStream = stream;
@@ -253,7 +257,6 @@ navigator.mediaDevices.getUserMedia({ audio: true })
             const indicator = document.getElementById(`indicator-${username}`);
             indicator.style.backgroundColor = volume > 0.1 ? 'green' : 'black';
             volumeIndicator.style.height = `${Math.min(volume * 100, 100)}%`;
-            mediaStream.getAudioTracks()[0].enabled = volume < 0.8 && volume > 0.05;
 
             requestAnimationFrame(updateVolumeIndicator);
         }
