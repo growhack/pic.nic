@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Picnic</title>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="user-list" id="users"></div>
+            <div class="controls">
+                <div class="volume-control">
+                    <label for="volume-slider">Громкость:</label>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" />
+                </div>
+                <div class="sensitivity-control">
+                    <label for="sensitivity-slider">Чувствительность:</label>
+                    <input type="range" id="sensitivity-slider" min="0" max="100" step="1" value="50" />
+                </div>
+                <div class="volume-indicator" id="volume-indicator" style="height: 10px; background: green;"></div>
+            </div>
+        </div>
+        <div class="chat-container">
+            <div class="tabs" id="tabs">
+                <div class="tab active" onclick="switchToMainChat()">Основной чат</div>
+                <div class="tab plus" onclick="addNewPrivateChat()">+</div>
+            </div>
+            <div id="chat-output" class="chat-output" data-chat-type="global"></div>
+            <div class="input-area">
+                <input id="chat-input" class="input-field" placeholder="Введите сообщение..." />
+                <button id="send-button" class="send-button">↑</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
