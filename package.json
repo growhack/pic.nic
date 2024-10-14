@@ -1,18 +1,12 @@
 {
-  "name": "voicechatapp",
+  "name": "voice-chat-app",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {    
+  "scripts": {
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "emoji-js": "^3.8.0",
-    "express": "^4.21.1",
-    "simple-peer": "^9.11.1",
-    "socket.io": "^4.8.0"
+    "express": "^4.18.2",
+    "socket.io": "^4.5.4"
   }
 }
