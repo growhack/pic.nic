@@ -1,4 +1,4 @@
-const socket = io('https://a01899e1-923f-4672-93ca-6bdb4e7326d8-00-2h0q4s1e6a027.sisko.replit.dev', {
+const socket = io('https://a01899e1-923f-4672-93ca-6bdb4e7326d8-00-2h0q4s1e6a027.sisko.replit.dev/', {
     transports: ['websocket'], // Используем только WebSocket
 });
 const chatInput = document.getElementById('chat-input');
@@ -12,8 +12,8 @@ const tabsContainer = document.getElementById('tabs');
 let username;
 let mediaStream;
 let activeTabId = 'chat';
-let openPrivateChats = {};
 let peerConnections = {};
+let openPrivateChats = {};
 
 // Запрос имени пользователя
 function requestUsername() {
@@ -22,10 +22,8 @@ function requestUsername() {
     } while (!username);
 }
 
-// Запрашиваем имя
+// Запрашиваем имя и уведомляем сервер
 requestUsername();
-
-// Уведомление о том, что пользователь присоединился
 socket.emit('user-joined', username);
 
 // Обновление списка пользователей
@@ -33,26 +31,17 @@ socket.on('update-users', (users) => {
     usersList.innerHTML = '';
     users.forEach(user => {
         const li = document.createElement('li');
-        const indicator = document.createElement('span');
-        indicator.classList.add('user-indicator');
-        indicator.id = `indicator-${user}`;
-
-        li.innerHTML = `
-            <div class="username-container">
-                <span>${user}</span>
-            </div>
-        `;
-        li.prepend(indicator);
+        li.textContent = user; // Отображаем имя пользователя
         usersList.appendChild(li);
     });
 });
 
-// Проверка подключения
-socket.on('connect', () => {
-    console.log('Подключён к серверу:', socket.id);
+// Уведомление о новом сообщении
+socket.on('chat-message', (messageObj) => {
+    addChatMessage(messageObj);
 });
 
-// Инициация WebRTC соединения для пользователя
+// Инициализация соединения WebRTC для другого пользователя
 function initiatePeerConnection(user) {
     const peerConnection = new RTCPeerConnection();
 
@@ -83,6 +72,7 @@ function initiatePeerConnection(user) {
     peerConnections[user] = peerConnection;
 }
 
+// Получение предложения WebRTC
 socket.on('webrtc-offer', (data) => {
     const peerConnection = new RTCPeerConnection();
     peerConnections[data.from] = peerConnection;
@@ -101,6 +91,7 @@ socket.on('webrtc-offer', (data) => {
         });
 });
 
+// Обработка ответа на WebRTC
 socket.on('webrtc-answer', (data) => {
     const peerConnection = peerConnections[data.from];
     if (peerConnection) {
@@ -108,6 +99,7 @@ socket.on('webrtc-answer', (data) => {
     }
 });
 
+// Обработка ICE кандидатов
 socket.on('ice-candidate', (data) => {
     const peerConnection = peerConnections[data.from];
     if (peerConnection) {
@@ -115,12 +107,7 @@ socket.on('ice-candidate', (data) => {
     }
 });
 
-// Обработка получения сообщения
-socket.on('chat-message', (messageObj) => {
-    addChatMessage(messageObj);
-});
-
-// Функция для отправки сообщения
+// Отправка сообщения
 sendButton.addEventListener('click', sendMessage);
 chatInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -132,12 +119,13 @@ function sendMessage() {
     const msg = chatInput.value.trim();
     if (msg) {
         const messageObj = { from: username, msg };
-        socket.emit('chat-message', messageObj); // Отправляем сообщение на сервер
-        addChatMessage(messageObj); // Добавляем сообщение в локальный чат
+        socket.emit('chat-message', messageObj); // Отправка на сервер
+        addChatMessage(messageObj); // Добавление в локальный вывод
         chatInput.value = '';
     }
 }
 
+// Добавление сообщения в интерфейс
 function addChatMessage(messageObj) {
     const p = document.createElement('p');
     p.textContent = `${messageObj.from}: ${messageObj.msg}`;
@@ -145,13 +133,15 @@ function addChatMessage(messageObj) {
     chatOutput.scrollTop = chatOutput.scrollHeight;
 }
 
-// Запрашиваем доступ к микрофону
+// Запрос доступа к микрофону
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
         mediaStream = stream;
     })
     .catch(err => console.error('Ошибка доступа к медиаустройствам.', err));
 
+// Обработчик изменения громкости
 volumeSlider.addEventListener('input', () => {
     const volume = volumeSlider.value;
+    // Логика управления громкостью (если требуется)
 });
