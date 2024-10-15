@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "https://pic-nic.vercel.app", // Укажите URL вашего клиента
+        origin: "https://7dedf1ed-3446-41ae-8831-f90ab714ab06-00-3v4y6ihn73rfl.pike.replit.dev", // Укажите URL вашего клиента
         methods: ["GET", "POST"],
         allowedHeaders: ["pic.nic"],
         credentials: true,
@@ -18,7 +18,6 @@ app.use(cors()); // Включаем CORS для всех запросов
 app.use(express.static('public'));
 
 let users = [];
-let privateChats = {};
 
 io.on('connection', (socket) => {
     socket.on('user-joined', (username) => {
@@ -26,40 +25,22 @@ io.on('connection', (socket) => {
             users.push(username);
             socket.username = username;
             io.emit('update-users', users);
+            // Уведомление всех пользователей о новом подключении
+            socket.broadcast.emit('chat-message', { from: 'Система', msg: `${username} присоединился к чату.` });
         } else {
             socket.emit('name-taken', username); // Уведомление, если имя занято
         }
     });
 
     socket.on('chat-message', (msg) => {
-        socket.broadcast.emit('chat-message', msg);
-    });
-
-    socket.on('private-message', (data) => {
-        if (!privateChats[data.to]) {
-            privateChats[data.to] = [];
-        }
-        privateChats[data.to].push({ from: socket.username, msg: data.msg });
-        socket.to(data.to).emit('private-message', { from: socket.username, msg: data.msg });
-        socket.to(data.to).emit('chat-open', { from: socket.username });
-    });
-
-    // WebRTC обработка
-    socket.on('webrtc-offer', (data) => {
-        socket.to(data.to).emit('webrtc-offer', { from: socket.username, sdp: data.sdp });
-    });
-
-    socket.on('webrtc-answer', (data) => {
-        socket.to(data.to).emit('webrtc-answer', { from: socket.username, sdp: data.sdp });
-    });
-
-    socket.on('ice-candidate', (data) => {
-        socket.to(data.to).emit('ice-candidate', { candidate: data.candidate, from: socket.username });
+        socket.broadcast.emit('chat-message', msg); // Отправляем в общий чат
     });
 
     socket.on('disconnect', () => {
         users = users.filter((user) => user !== socket.username);
         io.emit('update-users', users);
+        // Уведомление всех пользователей о отключении
+        socket.broadcast.emit('chat-message', { from: 'Система', msg: `${socket.username} вышел из чата.` });
     });
 });
 
