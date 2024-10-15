@@ -1,4 +1,4 @@
-const socket = io('https://pic-nic.vercel.app', {
+const socket = io('https://a01899e1-923f-4672-93ca-6bdb4e7326d8-00-2h0q4s1e6a027.sisko.replit.dev', {
     transports: ['websocket'], // Используем только WebSocket
 });
 const chatInput = document.getElementById('chat-input');
